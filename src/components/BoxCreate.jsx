@@ -14,7 +14,7 @@ import {
 const BoxCreate = () => {
   const [canvasMounted, setCanvasMounted] = useState(false);
 
-  // getting the map screenshot from context
+  // get the map screenshot from context
 
   const handleCanvasMount = (canvas) => {
     if (canvas) setCanvasMounted(true);
@@ -76,17 +76,27 @@ const BoxCreate = () => {
 
     camera.attachControl(canvas, true);
 
+    // top lighting
+
     const light1 = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
     light1.intensity = 0.7;
 
+    // bottom lighting
+
     const light2 = new HemisphericLight("light", new Vector3(0, -1, 0), scene);
     light2.intensity = 0.7;
+
+    // middle lighting
 
     const light3 = new HemisphericLight("light", new Vector3(0, 0, 0), scene);
     light3.intensity = 0.1;
 
+    // texture printing
+
     const boxDiffuseTexture = new Texture("logo512.png", scene);
+
+    // box face orientation (not working for left-right box face)
 
     const faceUV = new Array(6);
 
@@ -95,8 +105,12 @@ const BoxCreate = () => {
     faceUV[2] = new Vector4(0, 1, 1, 0);
     faceUV[3] = new Vector4(0, 0, 1, 1);
 
+    // box material
+
     const mat = new StandardMaterial("", scene);
     mat.diffuseTexture = boxDiffuseTexture;
+
+    // creating box
 
     let box = MeshBuilder.CreateBox("box", { size: 10, faceUV: faceUV }, scene);
     box.material = mat;
@@ -105,6 +119,7 @@ const BoxCreate = () => {
   };
 
   return (
+    // box styles/size control are in app.css
     <div className="">
       <SceneComponent
         antialias
