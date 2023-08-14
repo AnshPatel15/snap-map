@@ -5,12 +5,10 @@ import { useRef } from "react";
 import { useScreenshotContext } from "../contexts/ScreenshotContext";
 
 const MapBox = () => {
-  // screenshot of map
+  // getting screenshot of map
   const ref = useRef(null);
 
-  const [image, setImage] = useState(null);
-
-  const { screenshot, setScreenshot } = useScreenshotContext();
+  const { setScreenshot } = useScreenshotContext();
 
   const handleScreenshot = () => {
     const mapboxAccessToken = process.env.REACT_APP_MAP;
@@ -18,9 +16,10 @@ const MapBox = () => {
     const markerLatitude = markerLocation.latitude;
     const markerLongitude = markerLocation.longitude;
     const staticImageUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${markerLongitude},${markerLatitude})/${longitude},${latitude},${zoom}/600x600?access_token=${mapboxAccessToken}`;
-    setImage(staticImageUrl);
     setScreenshot(staticImageUrl);
   };
+
+  // default viewport location
 
   const [viewPort, setViewPort] = useState({
     width: "100 %",
@@ -29,6 +28,8 @@ const MapBox = () => {
     longitude: 77.216,
     zoom: 6,
   });
+
+  // default marker location
 
   const [markerLocation, setMarkerLocation] = useState({
     latitude: 28.6448,
