@@ -48,7 +48,7 @@ const MapBox = () => {
         <button onClick={handleScreenshot}>Take Screenshot</button>
       </div>
 
-      <div ref={ref} className="">
+      <div ref={ref} className=" h-full w-full">
         <Map
           onMove={(evt) => setViewPort(evt.viewState)}
           {...viewPort}
