@@ -13,11 +13,13 @@ import {
 import { useScreenshotContext } from "../contexts/ScreenshotContext";
 
 const BoxCreate = () => {
-  const [canvasMounted, setCanvasMounted] = useState(false);
-
   // getting the map screenshot from context
 
   const { screenshot } = useScreenshotContext();
+
+  // mounting box canvas only when screenshot is available
+
+  const [canvasMounted, setCanvasMounted] = useState(false);
 
   const handleCanvasMount = (canvas) => {
     if (canvas) setCanvasMounted(true);
@@ -79,6 +81,8 @@ const BoxCreate = () => {
 
     camera.attachControl(canvas, true);
 
+    // lighting settings 1- top, 2- bottom, 3- middle.
+
     const light1 = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
     light1.intensity = 0.7;
@@ -89,13 +93,17 @@ const BoxCreate = () => {
     const light3 = new HemisphericLight("light", new Vector3(0, 0, 0), scene);
     light3.intensity = 0.1;
 
+    // passing screenshot for texture
+
     const boxDiffuseTexture = new Texture(screenshot, scene);
+
+    // box face settings, box 1,2 would not change orientation.
 
     const faceUV = new Array(6);
 
     faceUV[0] = new Vector4(1, 1);
     faceUV[1] = new Vector4(-1, 0, 0, 1);
-    faceUV[2] = new Vector4(0, 1, 1, 0);
+    faceUV[2] = new Vector4(-1, 0, 0, 1);
     faceUV[3] = new Vector4(0, 0, 1, 1);
 
     const mat = new StandardMaterial("", scene);
