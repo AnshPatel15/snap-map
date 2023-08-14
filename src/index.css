@@ -1,4 +1,3 @@
-/* tailwind  */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,7 +7,34 @@ body {
   height: 100%;
 }
 
-/* canvas width default */
 #my-canvas-1 {
   width: 100%;
+}
+
+/* Set the width of the canvas to 576px on sm screens */
+@media (min-width: 576px) {
+  #my-canvas-1 {
+    width: 576px;
+  }
+}
+
+/* Set the width of the canvas to 768px on md screens */
+@media (min-width: 768px) {
+  #my-canvas-1 {
+    width: 768px;
+  }
+}
+
+/* Set the width of the canvas to 992px on lg screens */
+@media (min-width: 992px) {
+  #my-canvas-1 {
+    width: 992px;
+  }
+}
+
+/* Set the width of the canvas to 1728px on xl screens */
+@media (min-width: 1728px) {
+  #my-canvas-1 {
+    width: 1728px;
+  }
 }

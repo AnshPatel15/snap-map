@@ -14,7 +14,7 @@ export default ({
 }) => {
   const reactCanvas = useRef(null);
 
-  // setting up basic engine and scene (documentation)
+  // set up basic engine and scene
   useEffect(() => {
     const { current: canvas } = reactCanvas;
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SceneComponent from "./SceneComponent";
 
 import {
@@ -13,23 +13,37 @@ import {
 import { useScreenshotContext } from "../contexts/ScreenshotContext";
 
 const BoxCreate = () => {
+  const [canvasMounted, setCanvasMounted] = useState(false);
+
   // getting the map screenshot from context
 
   const { screenshot } = useScreenshotContext();
 
+  const handleCanvasMount = (canvas) => {
+    if (canvas) setCanvasMounted(true);
+  };
+  console.log("canvasMounted:", canvasMounted);
+
+  // preventing page scroll on canvas zoom scroll
   useEffect(() => {
+    if (!canvasMounted) return;
+    console.log("useEffect is running");
     const canvas = document.getElementById("my-canvas-1");
+
+    if (!canvas) return;
 
     const preventDefaultScroll = (event) => {
       event.preventDefault();
     };
 
     const enablePageScrolling = () => {
+      console.log("enablePageScrolling called");
       window.removeEventListener("wheel", preventDefaultScroll);
       window.removeEventListener("touchmove", preventDefaultScroll);
     };
 
     const disablePageScrolling = () => {
+      console.log("disablePageScrolling called");
       window.addEventListener("wheel", preventDefaultScroll, {
         passive: false,
       });
@@ -47,7 +61,7 @@ const BoxCreate = () => {
       canvas.removeEventListener("mouseleave", enablePageScrolling);
       enablePageScrolling(); // In case the component unmounts while the mouse is inside the canvas
     };
-  }, []);
+  }, [canvasMounted]);
 
   const onSceneReady = (scene) => {
     const camera = new ArcRotateCamera(
@@ -95,11 +109,14 @@ const BoxCreate = () => {
 
   return (
     <div className="">
-      <SceneComponent
-        antialias
-        onSceneReady={onSceneReady}
-        id={"my-canvas-1"}
-      />
+      {screenshot && (
+        <SceneComponent
+          antialias
+          onSceneReady={onSceneReady}
+          id={"my-canvas-1"}
+          onCanvasMount={handleCanvasMount}
+        />
+      )}
     </div>
   );
 };

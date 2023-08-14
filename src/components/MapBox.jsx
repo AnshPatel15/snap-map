@@ -7,6 +7,7 @@ import { useScreenshotContext } from "../contexts/ScreenshotContext";
 const MapBox = () => {
   // screenshot of map
   const ref = useRef(null);
+
   const [image, setImage] = useState(null);
 
   const { screenshot, setScreenshot } = useScreenshotContext();
@@ -42,9 +43,12 @@ const MapBox = () => {
   };
 
   return (
-    <div className=" h-full w-full">
-      <button onClick={handleScreenshot}>Take screenshot</button>
-      <div ref={ref} className=" h-full w-full">
+    <div className=" relative h-full w-full">
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10 border-2 border-rose-500 p-1 rounded-md bg-red-500 text-white">
+        <button onClick={handleScreenshot}>Take Screenshot</button>
+      </div>
+
+      <div ref={ref} className="">
         <Map
           onMove={(evt) => setViewPort(evt.viewState)}
           {...viewPort}
@@ -66,8 +70,6 @@ const MapBox = () => {
           />
         </Map>
       </div>
-      {/* {image && <img src={image} alt="map screenshot" />} */}
-      {screenshot && <img src={screenshot} alt="Screenshot" />}
     </div>
   );
 };
