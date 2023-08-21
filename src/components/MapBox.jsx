@@ -17,7 +17,7 @@ const MapBox = () => {
     const { latitude, longitude, zoom } = viewPort;
     const markerLatitude = markerLocation.latitude;
     const markerLongitude = markerLocation.longitude;
-    const staticImageUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${markerLongitude},${markerLatitude})/${longitude},${latitude},${zoom}/400x400?access_token=${mapboxAccessToken}`;
+    const staticImageUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${markerLongitude},${markerLatitude})/${longitude},${latitude},${zoom}/650x400?access_token=${mapboxAccessToken}`;
 
     const image = new Image();
     image.src = staticImageUrl;
