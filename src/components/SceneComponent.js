@@ -13,6 +13,13 @@ export default ({
   ...rest
 }) => {
   const reactCanvas = useRef(null);
+  const engineRef = useRef(null);
+  const sceneRef = useRef(null);
+  console.log("rerender of scene 1: ");
+
+  const resize = () => {
+    sceneRef.current.getEngine().resize();
+  };
 
   // set up basic engine and scene
   useEffect(() => {
@@ -24,38 +31,39 @@ export default ({
       onCanvasMount(canvas);
     }
 
-    const engine = new Engine(
+    engineRef.current = new Engine(
       canvas,
       antialias,
       engineOptions,
       adaptToDeviceRatio
     );
-    const scene = new Scene(engine, sceneOptions);
-    if (scene.isReady()) {
-      onSceneReady(scene);
+    sceneRef.current = new Scene(engineRef.current, sceneOptions);
+    if (sceneRef.current.isReady()) {
+      onSceneReady(sceneRef.current);
     } else {
-      scene.onReadyObservable.addOnce((scene) => onSceneReady(scene));
+      sceneRef.current.onReadyObservable.addOnce((scene) =>
+        onSceneReady(scene)
+      );
     }
 
-    engine.runRenderLoop(() => {
-      if (typeof onRender === "function") onRender(scene);
-      scene.render();
+    engineRef.current.runRenderLoop(() => {
+      if (typeof onRender === "function") onRender(sceneRef.current);
+      sceneRef.current.render();
     });
-
-    const resize = () => {
-      scene.getEngine().resize();
-    };
 
     if (window) {
       window.addEventListener("resize", resize);
     }
 
+    console.log("rerender of scene 2");
+
     return () => {
-      scene.getEngine().dispose();
+      sceneRef.current.getEngine().dispose();
 
       if (window) {
         window.removeEventListener("resize", resize);
       }
+      console.log("rerender of scene 3");
     };
   }, [
     antialias,

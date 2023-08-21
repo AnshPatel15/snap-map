@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import SceneComponent from "./SceneComponent";
 
 import {
@@ -13,17 +13,15 @@ import {
 import { useScreenshotContext } from "../contexts/ScreenshotContext";
 
 const BoxCreate = () => {
+  const [canvasMounted, setCanvasMounted] = useState(false);
+
   // getting the map screenshot from context
 
   const { screenshot } = useScreenshotContext();
 
-  // mounting box canvas only when screenshot is available
-
-  const [canvasMounted, setCanvasMounted] = useState(false);
-
-  const handleCanvasMount = (canvas) => {
+  const handleCanvasMount = useCallback((canvas) => {
     if (canvas) setCanvasMounted(true);
-  };
+  }, []);
   console.log("canvasMounted:", canvasMounted);
 
   // preventing page scroll on canvas zoom scroll
@@ -65,7 +63,49 @@ const BoxCreate = () => {
     };
   }, [canvasMounted]);
 
-  const onSceneReady = (scene) => {
+  // function to persist box and not recreate box every time screenshot changes
+
+  const boxRef = useRef(null);
+
+  const updateBoxTexture = useCallback(() => {
+    if (!boxRef.current || !screenshot) return;
+
+    const box = boxRef.current;
+    const scene = box.getScene();
+
+    if (box.material.diffuseTexture) {
+      box.material.diffuseTexture.dispose();
+    }
+
+    const boxDiffuseTexture = new Texture(screenshot, scene);
+    box.material.diffuseTexture = boxDiffuseTexture;
+
+    // Calculate the aspect ratio of the image and the box
+    const imageAspectRatio = 650 / 400;
+    const boxAspectRatio = box.scaling.x / box.scaling.y;
+
+    // Set the uScale and vScale properties of the texture
+    if (imageAspectRatio > boxAspectRatio) {
+      // Image is wider than the box
+      boxDiffuseTexture.uScale = boxAspectRatio / imageAspectRatio;
+      boxDiffuseTexture.vScale = 1;
+    } else {
+      // Image is taller than the box
+      boxDiffuseTexture.uScale = 1;
+      boxDiffuseTexture.vScale = imageAspectRatio / boxAspectRatio;
+    }
+
+    console.log("new texture");
+  }, [screenshot]);
+
+  useEffect(() => {
+    updateBoxTexture();
+  }, [updateBoxTexture]);
+
+  const onSceneReady = useCallback((scene) => {
+    console.log("recreated");
+    console.log("1st", onSceneReady);
+
     const camera = new ArcRotateCamera(
       "Camera",
       0,
@@ -81,8 +121,6 @@ const BoxCreate = () => {
 
     camera.attachControl(canvas, true);
 
-    // lighting settings 1- top, 2- bottom, 3- middle.
-
     const light1 = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
     light1.intensity = 0.7;
@@ -93,27 +131,24 @@ const BoxCreate = () => {
     const light3 = new HemisphericLight("light", new Vector3(0, 0, 0), scene);
     light3.intensity = 0.1;
 
-    // passing screenshot for texture
-
-    const boxDiffuseTexture = new Texture(screenshot, scene);
-
-    // box face settings, box 1,2 would not change orientation.
-
     const faceUV = new Array(6);
 
-    faceUV[0] = new Vector4(1, 1);
+    faceUV[0] = new Vector4(1, 0, 0, -1);
     faceUV[1] = new Vector4(-1, 0, 0, 1);
-    faceUV[2] = new Vector4(-1, 0, 0, 1);
+    faceUV[2] = new Vector4(0, 1, 1, 0);
     faceUV[3] = new Vector4(0, 0, 1, 1);
 
     const mat = new StandardMaterial("", scene);
-    mat.diffuseTexture = boxDiffuseTexture;
 
     let box = MeshBuilder.CreateBox("box", { size: 10, faceUV: faceUV }, scene);
     box.material = mat;
 
     box.position.y = 1;
-  };
+
+    boxRef.current = box;
+  }, []);
+
+  // console.log("2nd", onSceneReady);
 
   return (
     <div className="">

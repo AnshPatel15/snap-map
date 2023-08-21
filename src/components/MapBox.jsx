@@ -10,13 +10,31 @@ const MapBox = () => {
 
   const { setScreenshot } = useScreenshotContext();
 
-  const handleScreenshot = () => {
+  // using mapbox api
+
+  const handleApiSs = () => {
     const mapboxAccessToken = process.env.REACT_APP_MAP;
     const { latitude, longitude, zoom } = viewPort;
     const markerLatitude = markerLocation.latitude;
     const markerLongitude = markerLocation.longitude;
-    const staticImageUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${markerLongitude},${markerLatitude})/${longitude},${latitude},${zoom}/600x600?access_token=${mapboxAccessToken}`;
-    setScreenshot(staticImageUrl);
+    const staticImageUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${markerLongitude},${markerLatitude})/${longitude},${latitude},${zoom}/400x400?access_token=${mapboxAccessToken}`;
+
+    const image = new Image();
+    image.src = staticImageUrl;
+    image.onload = () => {
+      setScreenshot(staticImageUrl);
+    };
+  };
+
+  // locally handling screenshot
+
+  const handleLocalSs = () => {
+    const map = ref.current.getMap();
+
+    // Take the screenshot
+    const canvas = map.getCanvas();
+    const dataUrl = canvas.toDataURL();
+    setScreenshot(dataUrl);
   };
 
   // default viewport location
@@ -45,8 +63,19 @@ const MapBox = () => {
 
   return (
     <div className=" relative h-full w-full">
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10 border-2 border-rose-500 p-1 rounded-md bg-red-500 text-white">
-        <button onClick={handleScreenshot}>Take Screenshot</button>
+      <div className="flex gap-2 absolute top-2 left-1/2 transform -translate-x-1/2 z-10 ">
+        <button
+          className="flex flex-row  border-2  border-rose-500 p-1 rounded-md bg-red-500 text-white"
+          onClick={handleApiSs}
+        >
+          Take API Screenshot
+        </button>
+        <button
+          className="flex flex-row border-2 border-rose-500 p-1 rounded-md bg-red-500 text-white"
+          onClick={handleLocalSs}
+        >
+          Take Local Screenshot
+        </button>
       </div>
 
       <div ref={ref} className=" h-full w-full">
@@ -55,6 +84,8 @@ const MapBox = () => {
           {...viewPort}
           mapboxAccessToken={process.env.REACT_APP_MAP}
           mapStyle="mapbox://styles/ansh225/clkqvfw9600o201pbh3l0ht8q"
+          preserveDrawingBuffer={true}
+          ref={ref}
         >
           <Marker
             latitude={markerLocation.latitude}
